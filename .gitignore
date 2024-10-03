@@ -1,0 +1,15 @@
+# Node.js modules
+**/node_modules
+
+# Build directories
+**/dist
+
+# Rust build artifacts
+**/target
+**/target/debug/
+**/target/release/
+**/target/sbf-solana-solana/
+
+# Lock files and binary artifacts
+**/package-lock.json
+**/Cargo.lock
