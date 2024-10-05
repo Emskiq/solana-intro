@@ -27,7 +27,8 @@ fn process_instruction(
 
     // Directly from Solana Hello World example:
     //
-    // Iterating accounts is safer than indexing (recording to officials)
+    // Iterating accounts is safer than indexing
+    // - according to official documentation and actually it makes sense
     let accounts_iter = &mut accounts.iter();
 
     // Get the account to say hello to
