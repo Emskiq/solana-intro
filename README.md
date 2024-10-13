@@ -68,4 +68,80 @@ This is a basic program for transferring SOL between accounts. You can refer to 
 References:
 - [Solana Stack Exchange - Transfer SOL Simulation Error](https://solana.stackexchange.com/questions/7793/error-failed-to-send-transaction-transaction-simulation-failed-transaction-re)
 
+---
 
+### `mint-nft-raw`
+
+This is the first program related to *NFTs* in this tutorial series, developed using vanilla Rust with the official Solana crates: `solana-program`, `spl-token`, `spl-associated-token-account`.
+
+In the [first video related to NFTs](https://www.youtube.com/watch?v=3TXrrCAbRws&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=6&ab_channel=Coding%26Crypto), the CLI is used to *pseudo-create* an NFT token by following these steps:
+
+1. **Create a Token Account**  
+   This account will hold the related information. The token is created with 0 decimals to represent a unique item (essentially an NFT):
+   ```bash
+   spl-token create-token --decimals 0
+   ```
+   The structure of the information held in an [`spl_token`](https://docs.rs/spl-token/latest/spl_token/state/struct.Mint.html) (similar to ERC-20) at the time of writing looks like this:
+   ```rust
+   pub struct Mint {
+       /// Optional authority used to mint new tokens.
+       pub mint_authority: COption<Pubkey>,
+       /// Total supply of tokens.
+       pub supply: u64,
+       /// Number of base 10 digits to the right of the decimal place.
+       pub decimals: u8,
+       /// Is `true` if this structure has been initialized
+       pub is_initialized: bool,
+       /// Optional authority to freeze token accounts.
+       pub freeze_authority: COption<Pubkey>,
+   }
+   ```
+
+2. **Create an Account for Your Wallet**  
+   This account will hold information regarding the balance of the token created in step 1:
+   ```bash
+   spl-token create-account [token-pub-key]
+   ```
+
+3. **Mint Tokens**  
+   Mint tokens into the account created in the previous step:
+   ```bash
+   spl-token mint [pub-key-of-data-account-for-your-token]
+   ```
+
+4. **Disable Minting**  
+   Restrict further minting of the token, making you the only owner of the single minted token:
+   ```bash
+   spl-token authorize [token-pub-key] mint --disable
+   ```
+
+#### Key Points:
+- The above four steps are essentially replicated in Rust, except that before creating a token account (step 1), you must first create a normal account (with sufficient storage to hold the structure shown above, which is 82 bytes in size).
+- Once you create the regular account, you make it a *mint account* using the following command:
+  ```rust
+  invoke(
+      &token_instruction::initialize_mint(
+          &token_program.key,
+          &mint.key,
+          &mint_authority.key,
+          Some(&mint_authority.key),
+          0,
+      ).unwrap(),
+      &[
+          mint.clone(),
+          mint_authority.clone(),
+          token_program.clone(),
+          rent.clone(),
+      ],
+  )?;
+  ```
+- Pay close attention to the ownership of specific accounts:
+  - Even though you create the token account, the [SPL Token program](https://spl.solana.com/token) is actually the owner of that account. The same applies to the account holding the balance of your custom tokens.
+- Below is a diagram that illustrates the process, gathered from the [video series](https://www.youtube.com/watch?v=3TXrrCAbRws&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=6&ab_channel=Coding%26Crypto):
+
+![NFT-Structure](nft.webp)
+
+#### References:
+- [SPL Token Documentation](https://spl.solana.com/token)
+- [NFT Video Tutorial](https://www.youtube.com/watch?v=3TXrrCAbRws&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=6&ab_channel=Coding%26Crypto)
+- [SPL Token Struct Documentation](https://docs.rs/spl-token/latest/spl_token/state/struct.Mint.html)
