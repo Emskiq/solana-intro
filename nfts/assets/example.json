@@ -1,0 +1,10 @@
+{
+    "name": "YouTube NFT",
+    "symbol": "TUBE",
+    "description": "A test for our NFT example.",
+    "seller_fee_basis_points": 5,
+    "external_url": "",
+    "edition": "",
+    "background_color": "000000",
+    "image": "https://pbs.twimg.com/profile_images/1751256034260234240/eH3yK_YT_400x400.jpg"
+}
