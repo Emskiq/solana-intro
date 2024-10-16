@@ -8,8 +8,6 @@ describe("test", () => {
     // Configure the client to use the local cluster.
     const testNftTitle = "EMSKIQQQ";
     const testNftSymbol = "EMO";
-    // const testNftUri = "Does not matter since we are attaching random photo from web (check lib.rs file)";
-
     const testNftUri = "https://raw.githubusercontent.com/Emskiq/solana-intro/refs/heads/master/nfts/assets/example.json";
 
     const provider = anchor.AnchorProvider.env();
@@ -23,10 +21,7 @@ describe("test", () => {
         "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
     );
 
-    const computeBudgetIx = ComputeBudgetProgram.requestUnits({
-        units: 600_000, // Adjust units as needed (max 1,400,000)
-        additionalFee: 0,
-    });
+    const computeBudgetIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 });
 
     it("Mint!", async () => {
 
@@ -77,8 +72,8 @@ describe("test", () => {
             mintAuthority: wallet.publicKey,
             tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         })
-        // .preInstructions([computeBudgetIx])
         .signers([mintKeypair])
+        // .preInstructions([computeBudgetIx])
         .rpc();
     });
 });

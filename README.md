@@ -76,8 +76,8 @@ This is the first program related to *NFTs* in this tutorial series, developed u
 
 In the [first video related to NFTs](https://www.youtube.com/watch?v=3TXrrCAbRws&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=6&ab_channel=Coding%26Crypto), the CLI is used to *pseudo-create* an NFT token by following these steps:
 
-1. **Create a Token Account**  
-   This account will hold the related information. The token is created with 0 decimals to represent a unique item (essentially an NFT):
+1. **Create a Token Account**
+   This account will hold the related information. The token is created with 0 decimals, meaning there cannot be such a thing as 0.5 tokens:
    ```bash
    spl-token create-token --decimals 0
    ```
@@ -97,7 +97,7 @@ In the [first video related to NFTs](https://www.youtube.com/watch?v=3TXrrCAbRws
    }
    ```
 
-2. **Create an Account for Your Wallet**  
+2. **Create an Account for Your Wallet**
    This account will hold information regarding the balance of the token created in step 1:
    ```bash
    spl-token create-account [token-pub-key]
