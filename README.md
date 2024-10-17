@@ -15,7 +15,7 @@ Let’s start with some *basic rules* of Solana programs (smart contracts):
 - Program-derived data accounts (PDA), which store and manage program state, are created by programs themselves.
 - Development and testing of Solana programs often take place directly on the devnet, as it's easier and similar to working in a local environment.
 
-References:
+#### References:
 - [Official Solana Documentation](https://solana.com/docs/core/accounts) - Well-formed and simply explained documentation regarding the basic concepts of Solana development.
 - [Video Tutorials](https://www.youtube.com/playlist?list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1)
 
@@ -36,7 +36,7 @@ This is my first Solana program written in Rust using the Solana Web3.js SDK—a
 - The `client` code demonstrates how a transaction is constructed and sent to our program.
 - In our client, we defined a `TransactionInstruction`, where we passed the `program_id`, `accounts` (`keys` field in the Solana Web3.js SDK), and `instruction_data` (`data` field in the Solana Web3.js SDK).
 
-References:
+#### References:
 - [Official Solana Documentation for Rust Programs](https://solana.com/developers/guides/getstarted/rust-to-solana)
 - [Official Solana Documentation for JS Client](https://solana.com/docs/clients/javascript#interacting-with-custom-programs)
 - [Solana Web3.js Documentation](https://solana-labs.github.io/solana-web3.js/)
@@ -51,7 +51,7 @@ References:
 - Both programs have **state**, which is stored in another account (commonly referred to as a [*data account*](https://solana.com/docs/core/accounts#data-account)), separate from the one holding the program bytecode.
 - In the [`math.ts`](math-stuff/src/client/math.ts) file, you can see how the *client account* is created and passed into the `keys` field in `TransactionInstruction` — this account serves as our [data account](https://solana.com/docs/core/accounts#data-account).
 
-References:
+#### References:
 - [Official Solana Documentation](https://solana.com/docs/core/accounts#data-account) - Regarding the Solana account model.
 
 ---
@@ -65,7 +65,7 @@ This is a basic program for transferring SOL between accounts. You can refer to 
 - The `system_program` module in the Rust Solana crate has many built-in programs to handle common operations, such as transferring SOL.
 - In this program, multiple accounts are passed into the `TransactionInstruction`. Notably, one of the accounts must be marked as a **signer** to authorize the transaction.
 
-References:
+#### References:
 - [Solana Stack Exchange - Transfer SOL Simulation Error](https://solana.stackexchange.com/questions/7793/error-failed-to-send-transaction-transaction-simulation-failed-transaction-re)
 
 ---
@@ -145,3 +145,90 @@ In the [first video related to NFTs](https://www.youtube.com/watch?v=3TXrrCAbRws
 - [SPL Token Documentation](https://spl.solana.com/token)
 - [NFT Video Tutorial](https://www.youtube.com/watch?v=3TXrrCAbRws&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=6&ab_channel=Coding%26Crypto)
 - [SPL Token Struct Documentation](https://docs.rs/spl-token/latest/spl_token/state/struct.Mint.html)
+
+---
+
+### `mint-nft-anchor`
+
+This program introduces the well-known [`Anchor`](https://www.anchor-lang.com/) framework.
+<br>
+Initially, you need to install some packages and dependencies to set up your Anchor project. These steps are covered in [the tutorial series](https://www.youtube.com/watch?v=c1GJ-13z6pE&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=8&ab_channel=Coding%26Crypto), but I recommend following the [official documentation](https://www.anchor-lang.com/docs/installation) to do it on your own.
+
+It’s best to explore the framework yourself and try developing parts of the application independently. This will help you get familiar with the core concepts like [`Context`](https://www.anchor-lang.com/docs/the-program-module#context) and how to interact with deployed programs using TypeScript.
+
+This directory also includes [the next video](https://www.youtube.com/watch?v=c1GJ-13z6pE&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=8&ab_channel=Coding%26Crypto), where we implement logic for selling the NFT created in the previous video.
+
+#### Key Points:
+- The steps to create an NFT with `Anchor` are essentially the same; we just write it using *anchor-lang*. This applies to most of the logic.
+- The main difference is the ease of implementing programs and interacting with them using TypeScript. You don’t need to focus too much on structuring the transaction sent to your deployed program.
+- It’s simply about initializing an object of your program and calling the function you implemented in `lib.rs`, for example:
+```typescript 
+// 'program' is your deployed program, and 'mint' is the method called
+await program.methods.mint(
+        testNftTitle, testNftSymbol, testNftUri // arguments
+        )
+    .accounts({ // required accounts:
+    mint: mintKeypair.publicKey,
+    tokenAccount: tokenAddress
+    })
+    .signers([mintKeypair]) // signer/payer of the transaction (your wallet)
+    .rpc();
+```
+- Metaplex **crate** is not needed at all right now *(October 2024)*, so the original video and repository code may not work with the latest versions of Anchor. You can check my code (hopefully, it runs on your machine) for a more recent implementation sourced from [this excellent guide](https://medium.com/@elchuo160/create-your-own-on-chain-nfts-on-solana-with-anchor-and-quicknode-a-step-by-step-guide-2024-c108077013e9).
+- Metaplex provides a **[metadata program](https://developers.metaplex.com/token-metadata)**, which we use to assign data in a specific format.
+- Metaplex also offers a [master edition program](https://developers.metaplex.com/token-metadata#nfts) that creates a master edition account as proof of non-fungibility. However, the instruction `create_master_edition_v3` used over 200,000 compute units, causing the transaction to fail — *if anyone can help with this, it would be greatly appreciated*.
+
+#### References:
+- [Anchor Framework](https://www.anchor-lang.com/)
+- [Video Series on NFTs](https://www.youtube.com/watch?v=c1GJ-13z6pE&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=8&ab_channel=Coding%26Crypto)
+- [Anchor Official Documentation - Installation](https://www.anchor-lang.com/docs/installation)
+- [Context in Anchor](https://www.anchor-lang.com/docs/the-program-module#context)
+- [Metaplex Metadata Program](https://developers.metaplex.com/token-metadata)
+- [Metaplex Master Edition Program](https://developers.metaplex.com/token-metadata#nfts)
+
+---
+
+### `pda`
+
+This is the second program using `anchor-lang` and the first one that explores the fundamental concept of [PDAs - Program Derived Addresses](https://solana.com/docs/core/pda).
+
+The image below ([from the series](https://www.youtube.com/watch?v=JqINC16QrFM&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=10&ab_channel=Coding%26Crypto)) illustrates our use case. Though it may not be particularly useful in a real-world scenario, it provides a good example of how PDAs work and how they can be used if you need to store information on-chain, meaning you will store it in a different account than your program since we're working on Solana.
+
+![PDAs](pdas.webp)
+
+#### Key Points:
+- This program demonstrates how easily Anchor handles PDAs with a simple macro like `init`:
+
+```rust
+#[derive(Accounts)]
+#[instruction(color: String)]
+pub struct CreateLedger<'info> {
+    #[account(
+        init, // This is where the magic happens -> creating by anchor
+        payer = wallet,
+        space = 82,
+        seeds = [wallet.key().as_ref(), b"_", color.as_ref()],
+        bump
+    )]
+    pub ledger_account: Account<'info, Ledger>,
+    // some other accounts
+}
+
+#[account]
+pub struct Ledger {
+    pub color: String,
+    pub balance: u32,
+}
+```
+- Interacting with the state of your program, like the instance of the `Ledger` struct in our case, is also very easy with TypeScript:
+```ts
+let data;
+// ...
+data = await program.account.ledger.fetch(pda);
+```
+
+#### References:
+
+- [PDAs - Program Derived Addresses](https://solana.com/docs/core/pda)
+- [Video Series on PDAs](https://www.youtube.com/watch?v=JqINC16QrFM&list=PLUBKxx7QjtVnU3hkPc8GF1Jh4DE7cf4n1&index=10&ab_channel=Coding%26Crypto)
+
